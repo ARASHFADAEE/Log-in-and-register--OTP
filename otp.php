@@ -1,3 +1,31 @@
+<?php
+require_once './config/loader.php';
+
+if(isset($_POST['send-mobile'])) {
+
+    include_once './config/sms-panel.php';
+    $opt = rand(1000, 9999);
+    $mobile_number = $_POST['mobile'];
+    $verify= new verify($api_rahpayam,$pattern_rahpayam);
+    $verify->send_otp($opt,$mobile_number);
+
+
+
+
+
+
+
+
+
+
+};
+
+
+
+
+?>
+
+
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -20,14 +48,17 @@
     <div class="form-container sign-in">
         <!----------------------------------Login-------------------------------------->
 
-        <form>
+        <form method="post">
             <h1>OTP</h1>
 
             <span>OTP</span>
-            <input type="number" placeholder="enter your Otp Code">
+<!--            <input type="number" placeholder="enter your Otp Code">-->
+            <input type="text" name="mobile" placeholder="enter your phone number ">
+
             <a href="#">Forget your Password?</a>
 
-            <button>Send to mobile</button>
+
+            <button type="submit" name="send-mobile">Send to mobile</button>
             <a style="font-weight: bold" href="otp.php">to email </a>
 
 
