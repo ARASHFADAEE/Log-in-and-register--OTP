@@ -29,28 +29,7 @@ require_once ('./config/loader.php');
     </div>
     <div class="form-container sign-in">
         <!----------------------------------Login-------------------------------------->
-
-        <form>
-        <h1>Sign In</h1>
-        <div class="social-icons">
-          <a href="#" class="icons"><i class="fa-brands fa-google-plus-g"></i></a>
-          <a href="#" class="icons"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" class="icons"><i class="fa-brands fa-github"></i></a>
-          <a href="#" class="icons"><i class="fa-brands fa-linkedin-in"></i></a>
-        </div>
-        <span>or use your email/password</span>
-        <input type="text" placeholder="Mobile / Email / UserName">
-        <input type="password" placeholder="Password">
-        <a href="#">Forget your Password?</a>
-
-            <button>Sign In</button>
-            <a style="font-weight: bold" href="otp.php">Send Otp </a>
-
-
-
-
-        </form>
-
+         <?php include_once './inc/login-form.php'?>
         <!----------------------------------End Login-------------------------------------->
 
     </div>
