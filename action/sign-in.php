@@ -26,7 +26,7 @@ if (isset($_POST['signin'])) {
 
         $hasuser= $stmt->rowCount();
         if($hasuser===1){
-            echo "your loggined";
+            header('location:../index.php?userlogin==ok');
 
         }else{
             header('location:../index.php?notuser==ok');
