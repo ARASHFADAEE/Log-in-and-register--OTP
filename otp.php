@@ -2,26 +2,43 @@
 require_once './config/loader.php';
 
 if(isset($_POST['send-mobile'])) {
+    $mobile_number = $_POST['mobile'];
+
+    try {
+        $key = $_POST['send-mobile'];
+
+        //sql
+        $query = "SELECT * FROM `users` WHERE (username = :key OR mobile = :key OR email = :key)";
+        //stmt
+        $stmt = $conn->prepare($query);
+
+        //bind
+        $stmt->bindValue(":key", $mobile_number);
+
+
+        //exe
+        $stmt->execute();
+
+        $hasuser = $stmt->rowCount();
+        if (!$hasuser) {
+            header('location:./otp.php?error=notuser');
+        }else{
+            header('location:./otp.php?success=true');
+
+        }
+
+
+    }catch (PDOException $e) {
+        echo $e;
+    };
+
 
     include_once './config/sms-panel.php';
     $opt = rand(1000, 9999);
-    $mobile_number = $_POST['mobile'];
     $verify= new verify($api_rahpayam,$pattern_rahpayam);
     $verify->send_otp($opt,$mobile_number);
 
-
-
-
-
-
-
-
-
-
 };
-
-
-
 
 ?>
 
@@ -32,6 +49,7 @@ if(isset($_POST['send-mobile'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="./assets/css/style.css">
     <title>login and register with otp</title>
 </head>
@@ -52,20 +70,39 @@ if(isset($_POST['send-mobile'])) {
             <h1>OTP</h1>
 
             <span>OTP</span>
-<!--            <input type="number" placeholder="enter your Otp Code">-->
-            <input type="text" name="mobile" placeholder="enter your phone number ">
+            <?php
+            if(isset($_GET['success'])){
+                echo '<input type="number" placeholder="enter your Otp Code">';
+
+            }else{
+                echo '<input type="text" name="mobile" placeholder="enter your phone number ">
+';
+            }
+
+            ?>
 
             <a href="#">Forget your Password?</a>
+            <?php
+            if(isset($_GET['success'])){
+                echo '<button type="submit" name="send-mobile">Check Otp</button>';
 
+            }else{
+                echo '<button type="submit" name="send-mobile">Send to mobile</button>';
+            }
 
-            <button type="submit" name="send-mobile">Send to mobile</button>
-            <a style="font-weight: bold" href="otp.php">to email </a>
+            ?>
 
+            <?php
+            if(isset($_GET['error'])){
+                echo '<p class="alert alert-danger  ">user not found</p>';
 
+            };
+            if(isset($_GET['success'])){
+                echo '<p class="alert alert-success  ">otp code send to mobile</p>';
 
+            };
 
-        </form>
-
+            ?>
         <!----------------------------------End Login-------------------------------------->
 
     </div>
@@ -85,5 +122,7 @@ if(isset($_POST['send-mobile'])) {
     </div>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 <script src="assets/js/script.js"></script>
 </html>
