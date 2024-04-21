@@ -12,16 +12,8 @@
 <div class="container" id="container">
     <div class="form-container sign-up">
         <!----------------------------------signup-------------------------------------->
-        <form>
-            <h1>Create Account</h1>
+        <?php include_once './inc/register-form.php'?>
 
-            <span>or use your email to registration</span>
-            <input type="text" placeholder="Name">
-            <input type="email" placeholder="Email">
-            <input type="text" placeholder="phone">
-            <input type="password" placeholder="Password">
-            <button>Sign Up</button>
-        </form>
         <!----------------------------------end signup-------------------------------------->
 
     </div>

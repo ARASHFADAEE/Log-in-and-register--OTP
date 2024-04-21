@@ -4,6 +4,8 @@
 require_once ('./config/loader.php');
 
 
+
+
 ?>
 
 
@@ -21,16 +23,7 @@ require_once ('./config/loader.php');
   <div class="container" id="container">
     <div class="form-container sign-up">
        <!----------------------------------signup-------------------------------------->
-      <form>
-        <h1>Create Account</h1>
-
-        <span>or use your email to registration</span>
-        <input type="text" placeholder="Name">
-        <input type="email" placeholder="Email">
-          <input type="text" placeholder="phone">
-          <input type="password" placeholder="Password">
-        <button>Sign Up</button>
-      </form>
+       <?php include_once './inc/register-form.php'?>
         <!----------------------------------end signup-------------------------------------->
 
     </div>
