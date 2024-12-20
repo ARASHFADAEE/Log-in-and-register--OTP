@@ -1,128 +1,246 @@
-<?php
-require_once './config/loader.php';
 
-if(isset($_POST['send-mobile'])) {
-    $mobile_number = $_POST['mobile'];
+<?php
+
+require_once ('./config/loader.php');
+
+if (isset($_POST['otpsend'])){
 
     try {
-        $key = $_POST['send-mobile'];
+        $mobile = $_POST['phoneotp'];
 
-        //sql
-        $query = "SELECT * FROM `users` WHERE (username = :key OR mobile = :key OR email = :key)";
+        //SQL
+        $query = "SELECT * FROM `users` WHERE (`mobile`= :key OR `email`= :key)";
+
+
         //stmt
-        $stmt = $conn->prepare($query);
+
+        $stmt =$conn->prepare($query);
 
         //bind
-        $stmt->bindValue(":key", $mobile_number);
+        $stmt->bindValue(":key",$mobile);
 
 
-        //exe
         $stmt->execute();
 
-        $hasuser = $stmt->rowCount();
-        if (!$hasuser) {
-            header('location:./otp.php?error=notuser');
+        $hasuser=$stmt->Rowcount();
+
+        if($hasuser){
+
+            $rand=rand(10000,99999);
+
+            //sql
+
+            $save_otp="UPDATE `users` SET `otp`=? WHERE mobile=? OR email=?";
+
+            $stmt =$conn->prepare($save_otp);
+
+            $stmt->bindValue(1,$rand);
+            $stmt->bindValue(2,$mobile);
+            $stmt->bindValue(3,$mobile);
+
+
+
+            $stmt->execute();
+
+            $smsnow->send_sms($mobile,257970,$rand);
+
+            header('location: ./otp.php?otp=ok&mobile='.$mobile);
+
         }else{
-            header('location:./otp.php?success=true');
+            header('location: ./otp.php?usernot=ok');
 
         }
 
 
-    }catch (PDOException $e) {
-        echo $e;
-    };
+    }catch (PDFlibException $e){
+        echo $e->getMessage();
+    }
 
 
-    include_once './config/sms-panel.php';
-    $opt = rand(1000, 9999);
-    $verify= new verify($api_rahpayam,$pattern_rahpayam);
-    $verify->send_otp($opt,$mobile_number);
 
-};
+}
+
+
+if(isset($_POST['check_otp'])){
+    $otp=$_POST['otp_code'];
+    $mobile_otp=$_GET['mobile'];
+
+
+    try {
+
+        //SQL
+        $query = "SELECT * FROM `users` WHERE (`mobile`= :key OR `email`= :key) AND `otp`=:otp ";
+
+
+        //stmt
+
+        $stmt =$conn->prepare($query);
+
+        //bind
+        $stmt->bindValue(":key",$mobile_otp);
+        $stmt->bindValue(":otp",$otp);
+
+
+
+        $stmt->execute();
+
+        $hasuser=$stmt->Rowcount();
+
+
+        if($hasuser){
+            header('location: ./otp.php?otp_verify=ok');
+        }else{
+            header('location: ./otp.php?otp_verify=notfound');
+
+        }
+
+
+
+    }catch (PDFlibException $e){
+        echo  $e->getMessage();
+    }
+
+}
+
 
 ?>
 
 
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="./assets/css/style.css">
-    <title>login and register with otp</title>
-</head>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>احراز هویت</title>
+    <link
+      rel="icon"
+      href="./assets/icons/iran-ausbildung-icon.png"
+      type="image/x-icon"
+          />
+    <link rel="stylesheet" href="./styles/normalize.css" />
+    <link rel="stylesheet" href="./styles/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
+  <body>
+    <main class="register-page px-3">
+      <div>
+        <a class="navbar-brand nav-bar-logo" href="/">
+          <img
+            src="./assets/icons/iran-ausbildung-icon.png"
+            alt="logo"
+            class="logo-img"
+/>
+          <span class="fs-6 text-white ps-1">ایـــران آوسـبـیـلـدونـــگ</span>
+        </a>
+      </div>
+      <form class="bg-white rounded-4 px-4 py-3 register-form w-100 mt-5 mb-4"  method="post" >
+          <?php
+          if (isset($_GET['usernot']) && $_GET['usernot']=='ok'){
+          ?>
 
-<body>
-<div class="container" id="container">
-    <div class="form-container sign-up">
-        <!----------------------------------signup-------------------------------------->
-        <?php include_once './inc/register-form.php'?>
+          <div class="alert alert-danger" style="padding-bottom: 0px !important;">
+              <p>شماره شما در سایت ثبت نشده لطفا ثبت نام کنید</p>
+          </div>
 
-        <!----------------------------------end signup-------------------------------------->
+          <?php
+          }
+          ?>
 
-    </div>
-    <div class="form-container sign-in">
-        <!----------------------------------Login-------------------------------------->
+          <?php
+          if (isset($_GET['otp_verify']) && $_GET['otp_verify']=='notfound'){
+          ?>
+          <div class="alert alert-danger" style="padding-bottom: 0px !important;">
+              <p>کد وارد شده اشتباه میباشد</p>
+          </div>
+          <?php
+          }
+          ?>
 
-        <form method="post">
-            <h1>OTP</h1>
+          <?php
+          if (isset($_GET['otp_verify']) && $_GET['otp_verify']=='ok'){
+              ?>
+              <div class="alert alert-success" style="padding-bottom: 0px !important;">
+                  <p>ورود با موفقیت انجام شد</p>
+              </div>
+              <?php
+          }
+          ?>
 
-            <span>OTP</span>
+
+          <?php
+          if (!isset($_GET['otp'])){
+          ?>
+        <p class="fs-xs text-gray-200 my-3">
+برای ورود لطفا شماره تلفن همراه خود را وارد کنید
+        </p>
+          <?php }?>
+        <div>
+
             <?php
-            if(isset($_GET['success'])){
-                echo '<input type="number" placeholder="enter your Otp Code">';
+            if (isset($_GET['otp']) && $_GET['otp']=='ok'){
+                ?>
 
+                <div>
+                    <label class="fs-xs fw-600 mb-2" for="registerEmail"
+                    >کد یک بار مصرف پیامک شده:</label
+                    >
+                    <div class="p-1 bg-gray-300 w-100 d-flex rounded-1 mb-2">
+                        <div>
+                            <img
+                                    class="px-2 py-2"
+                                    src="./assets/icons/lock-open-icon-svg.svg"
+                                    alt=""
+                            />
+                        </div>
+                        <input
+                                id="registerEmail"
+                                class="register-fields flex-grow-1 bg-gray-300 px-2"
+                                type="text"
+                                placeholder="مثال 1234"
+                                name="otp_code"
+                        />
+                    </div>
+                </div>
+            <?php
             }else{
-                echo '<input type="text" name="mobile" placeholder="enter your phone number ">
-';
-            }
 
             ?>
 
-            <a href="#">Forget your Password?</a>
-            <?php
-            if(isset($_GET['success'])){
-                echo '<button type="submit" name="send-mobile">Check Otp</button>';
-
-            }else{
-                echo '<button type="submit" name="send-mobile">Send to mobile</button>';
-            }
-
-            ?>
-
-            <?php
-            if(isset($_GET['error'])){
-                echo '<p class="alert alert-danger  ">user not found</p>';
-
-            };
-            if(isset($_GET['success'])){
-                echo '<p class="alert alert-success  ">otp code send to mobile</p>';
-
-            };
-
-            ?>
-        <!----------------------------------End Login-------------------------------------->
-
-    </div>
-    <div class="toggle-container">
-        <div class="toggle">
-            <div class="toggle-panel toggle-left">
-                <h1>Welcome Back!</h1>
-                <p>Enter your Personal details to use all of site features</p>
-                <button class="hidden" id="login">Sign In</button>
+          <div class="p-1 bg-gray-300 w-100 d-flex rounded-1 mb-2">
+            <div>
+              <img
+                class="px-2 py-2"
+                src="./assets/icons/phone-gray-icon.svg"
+                alt=""
+                    />
             </div>
-            <div class="toggle-panel toggle-right">
-                <h1>Hello, Friend!</h1>
-                <p>Register with your Personal details to use all of site features</p>
-                <button class="hidden" id="register">Sign Up</button>
-            </div>
+            <input
+              id="registerEmail"
+              class="register-fields flex-grow-1 bg-gray-300 px-2"
+              type="text"
+              placeholder="مثال 09123456789"
+              name="phoneotp"
+                  />
+          </div>
         </div>
-    </div>
-</div>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-<script src="assets/js/script.js"></script>
+<?php }?>
+          <?php
+          if (isset($_GET['otp']) && $_GET['otp']=='ok'){
+          ?>
+          <button type="submit" name="check_otp" class="w-100 py-2 mt-3 rounded-3 bg-brand text-white">
+برسی کد تایید
+        </button>
+<?php }else{?>
+
+              <button type="submit" name="otpsend" class="w-100 py-2 mt-3 rounded-3 bg-brand text-white">
+                  ارسال کد تایید
+              </button>
+          <?php }?>
+      </form>
+
+    </main>
+    <script type="module" src="./js/index.js"></script>
+    <script src="./js/bootstrap/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
