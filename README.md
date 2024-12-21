@@ -17,16 +17,21 @@ It is a login and registration page using OTP
 ![App Screenshot](https://dl.volnamusic.ir/project-img/otp/1.png)
 
 
+** register page **
+
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/2.png)
+
+
 ** OTP Page **
 
 
-![App Screenshot](https://dl.volnamusic.ir/project-img/otp/2.png)
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/3.png)
 
 
 ** check OTP Page with alert **
 
 
-![App Screenshot](https://dl.volnamusic.ir/project-img/otp/3.png)
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/4.png)
 
 ## Deployment
 
