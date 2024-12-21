@@ -14,19 +14,19 @@ It is a login and registration page using OTP
 
 ** login page **
 
-![App Screenshot](https://dl.volnamusic.ir/project-img/otp/1.PNG)
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/1.png)
 
 
 ** OTP Page **
 
 
-![App Screenshot](https://dl.volnamusic.ir/project-img/otp/2.PNG)
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/2.png)
 
 
 ** check OTP Page with alert **
 
 
-![App Screenshot](https://dl.volnamusic.ir/project-img/otp/3.PNG)
+![App Screenshot](https://dl.volnamusic.ir/project-img/otp/3.png)
 
 ## Deployment
 
